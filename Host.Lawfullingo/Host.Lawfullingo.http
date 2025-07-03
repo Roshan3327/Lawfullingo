@@ -1,0 +1,6 @@
+@Host.Lawfullingo_HostAddress = http://localhost:5195
+
+GET {{Host.Lawfullingo_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

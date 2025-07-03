@@ -1,0 +1,18 @@
+﻿using Entity.Lawfullingo;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Data.Lawfullingo.Repository.userses
+{
+    public interface IUsersRepository
+    {
+        Task<IEnumerable<Users>> GetAllAsync();
+        Task<Users> GetByIdAsync(int id);
+        Task AddAsync(Users user);
+        Task UpdateAsync(Users user);
+        Task DeleteAsync(int id);
+    }
+}
