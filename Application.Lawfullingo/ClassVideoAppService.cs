@@ -3,57 +3,120 @@ using ApplicationContract.Lawfullingo.IApplicationService;
 using AutoMapper;
 using Data.Lawfullingo.Repository.ClassVideos;
 using Entity.Lawfullingo;
+using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Lawfullingo
+namespace Application.Lawfullingo;
+
+public class ClassVideoAppService : IClassVideoAppService
 {
-    public class ClassVideoAppService : IClassVideoAppService
+    private readonly IClassVideosRepository _repository;
+    private readonly IMapper _mapper;
+    private readonly IWebHostEnvironment _env;
+
+    public ClassVideoAppService(IClassVideosRepository repository, IMapper mapper, IWebHostEnvironment env)
     {
-        private readonly IClassVideosRepository _repository;
-        private readonly IMapper _mapper;
-        public ClassVideoAppService(IClassVideosRepository repository, IMapper mapper)
+        _repository = repository;
+        _mapper = mapper;
+        _env = env;
+    }
+    public async Task<IEnumerable<ClassVideoGetDto>> GetAllAsync()
+    {
+        var videos = await _repository.GetAllAsync();
+        return videos.Select(v => new ClassVideoGetDto
         {
-            _repository = repository;
-            _mapper = mapper;
+            Id = v.id,
+            video_url = v.video_url,
+            created_at = v.created_at
+        });
+    }
+    
+
+    public async Task<ClassVideoGetDto> GetByIdAsync(int id)
+    {
+        var video = await _repository.GetByIdAsync(id);
+        return _mapper.Map<ClassVideoGetDto>(video);
+    }
+
+    public async Task AddAsync(ClassVideoCreateDto dto)
+    {
+        var video = _mapper.Map<Class_Videos>(dto);
+        video.created_at = DateTime.UtcNow;
+
+        await _repository.AddAsync(video);
+    }
+
+    public async Task UpdateAsync(ClassVideoUpdateDto dto)
+    {
+        var existing = await _repository.GetByIdAsync(dto.Id);
+        if (existing != null)
+        {
+            existing.video_url = dto.video_url;
+            await _repository.UpdateAsync(existing);
         }
-        public async Task<IEnumerable<ClassVideoGetDto>> GetAllAsync()
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        await _repository.DeleteAsync(id);
+    }
+    public async Task<ClassVideoGetDto> UploadAsync(ClassVideoCreateDto dto)
+    {
+        if (dto.VideoFile == null || dto.VideoFile.Length == 0)
+            throw new ArgumentException("Invalid video file");
+
+        string fileName = Guid.NewGuid() + Path.GetExtension(dto.VideoFile.FileName);
+        string folder = Path.Combine(_env.WebRootPath, "videos");
+
+        if (!Directory.Exists(folder))
+            Directory.CreateDirectory(folder);
+
+        string path = Path.Combine(folder, fileName);
+
+        using (var stream = new FileStream(path, FileMode.Create))
         {
-            var videos = await _repository.GetAllAsync();
-            return _mapper.Map<IEnumerable<ClassVideoGetDto>>(videos);
+            await dto.VideoFile.CopyToAsync(stream);
         }
 
-        public async Task<ClassVideoGetDto> GetByIdAsync(int id)
+        var entity = new Class_Videos
         {
-            var video = await _repository.GetByIdAsync(id);
-            return _mapper.Map<ClassVideoGetDto>(video);
-        }
+            video_url = "/videos/" + fileName,
+            created_at = DateTime.UtcNow
+        };
 
-        public async Task AddAsync(ClassVideoCreateDto dto)
+        await _repository.AddAsync(entity);
+
+        return new ClassVideoGetDto
         {
-            var video = _mapper.Map<Class_Videos>(dto);
-            video.created_at = DateTime.UtcNow;
+            Id = entity.id,
+            video_url = entity.video_url,
+            created_at = entity.created_at
+        };
+    }
 
-            await _repository.AddAsync(video);
-        }
+    public async Task<List<ClassVideoOnlyDto>> GetUserPurchaseClassVideosAsync(int userId)
+    {
+      var classEntities = await _repository.GetUserClassVideosAsync(userId);
+        var videoList = new List<ClassVideoOnlyDto>();
 
-        public async Task UpdateAsync(ClassVideoUpdateDto dto)
+        foreach (var cc in classEntities)
         {
-            var existing = await _repository.GetByIdAsync(dto.Id);
-            if (existing != null)
+            if (cc.video_url != null && !string.IsNullOrEmpty(cc.video_url))
             {
-                existing.video_url = dto.VideoUrl;
-                await _repository.UpdateAsync(existing);
+                var dto = new ClassVideoOnlyDto
+                {
+                    video_url = cc.video_url
+                };
+
+                videoList.Add(dto);
             }
         }
 
-        public async Task DeleteAsync(int id)
-        {
-            await _repository.DeleteAsync(id);
-        }
+        return videoList;
     }
 
 }

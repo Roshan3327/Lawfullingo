@@ -14,5 +14,7 @@ namespace Data.Lawfullingo.Repository.ClassVideos
         Task AddAsync(Class_Videos video);
         Task UpdateAsync(Class_Videos video);
         Task DeleteAsync(int id);
+        Task<List<Class_Videos>> GetUserPurchaseClassVideosAsync(int userId);
+        Task<List<Course_Class>> GetUserClassVideosAsync(int CourseId);
     }
 }

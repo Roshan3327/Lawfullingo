@@ -1,7 +1,7 @@
 ﻿using ApplicationContract.Lawfullingo.Dto.CategoryDto;
 using ApplicationContract.Lawfullingo.IApplicationService;
 using AutoMapper;
-using Data.Lawfullingo.Repository;
+using Data.Lawfullingo.Repository.Categories;
 using Entity.Lawfullingo;
 using System;
 using System.Collections.Generic;

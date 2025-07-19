@@ -11,7 +11,7 @@ namespace ApplicationContract.Lawfullingo.Dto.UsersDto
         public int Id { get; set; }
         public string UserName { get; set; }
         public string UserEmail { get; set; }
-        public int Mobile { get; set; }
+        public long? Mobile { get; set; }
         public string ProfileImage { get; set; }
         public string Gender { get; set; }
         public DateTime UserDob { get; set; }

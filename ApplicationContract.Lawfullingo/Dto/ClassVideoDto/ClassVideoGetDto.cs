@@ -9,7 +9,7 @@ namespace ApplicationContract.Lawfullingo.Dto.ClassVideoDto
     public class ClassVideoGetDto
     {
         public int Id { get; set; }
-        public string VideoUrl { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public string video_url { get; set; }
+        public DateTime created_at { get; set; }
     }
 }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Data.Lawfullingo.Repository.Courses;
 
-public class CourseRepository
+public class CourseRepository : ICourseRepository
 {
     private readonly ApplicationDbContext _context;
 
@@ -56,4 +56,41 @@ public class CourseRepository
            await _context.SaveChangesAsync();
         }
     }
-} 
+    public async Task<IEnumerable<Course>> GetByLanguageAsync(string language)
+    {
+        return await _context.Courses
+            .Where(c => c.language.ToLower() == language.ToLower())
+            .Include(c => c.category)
+            .Include(c => c.teachers)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Course>> GetByFlagAsync(CourseFlag flag)
+    {
+        return await _context.Courses
+            .Where(c => c.flag == flag)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Course>> GetByTeacherIdAsync(int teacherId)
+    {
+        return await _context.Courses
+                             .Where(c => c.teachersid == teacherId)
+                             .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Course>> GetByStatusAsync(bool status)
+    {
+        return await _context.Courses
+                             .Where(c => c.status == status)
+                             .ToListAsync();
+    }
+    public async Task<IEnumerable<Course>> GetByCategoryIdAsync(int categoryId)
+    {
+        return await _context.Courses
+                             .Where(c => c.categoryId == categoryId)
+                             .Include(c => c.category)
+                             .Include(c => c.teachers)
+                             .ToListAsync();
+    }
+}

@@ -29,7 +29,7 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(c => c.course_id)
             .OnDelete(DeleteBehavior.Restrict); // or .SetNull
     }
-
+   
     public DbSet<Category> Categories { get; set; }
     public DbSet<Class_Videos> Class_Videos { get; set; }
     public DbSet<Course> Courses { get; set; }
@@ -37,5 +37,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Purchase> Purchase { get; set; }
     public DbSet<Teachers> Teachers { get; set; }
     public DbSet<Users> Users { get; set; }
+    public DbSet<TeacherType> TeacherTypes { get; set; }
+    public DbSet<OTP> OTPs { get; set; }
 }
     

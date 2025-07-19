@@ -1,6 +1,7 @@
 ﻿
 
 using ApplicationContract.Lawfullingo.Dto.ClassVideoDto;
+using Entity.Lawfullingo;
 
 namespace ApplicationContract.Lawfullingo.IApplicationService;
 
@@ -11,6 +12,8 @@ public interface IClassVideoAppService
     Task AddAsync(ClassVideoCreateDto dto);
     Task UpdateAsync(ClassVideoUpdateDto dto);
     Task DeleteAsync(int id);
+    Task<ClassVideoGetDto> UploadAsync(ClassVideoCreateDto dto);
+    Task<List<ClassVideoOnlyDto>> GetUserPurchaseClassVideosAsync(int userId);
+
 
 }
- 

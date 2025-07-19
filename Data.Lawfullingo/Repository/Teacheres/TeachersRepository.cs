@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Data.Lawfullingo.Repository.Teacheres
 {
-    public class TeachersRepository
+    public class TeachersRepository:ITeachersRepository
     {
         private readonly ApplicationDbContext _context;
 
@@ -48,10 +48,34 @@ namespace Data.Lawfullingo.Repository.Teacheres
                 .Include(t => t.course_Classes)
                 .FirstOrDefaultAsync(t => t.id == id);
         }
-        public async Task UpdateAsync(Teachers teacher)
+
+        // Assuming _context is your ApplicationDbContext and it has DbSet<Teachers> Teachers
+
+        public async Task<Teachers> GetTeacherByEmailAsync(string teacher_email)
         {
-            _context.Teachers.Update(teacher);
+            return await _context.Teachers
+                .Include(t => t.teacherType)
+                .FirstOrDefaultAsync(t => t.teacher_email == teacher_email);
+        }
+
+        public async Task<Teachers> GetTeacherByMobileAsync(long? mobile)
+        {
+            return await _context.Teachers
+                .FirstOrDefaultAsync(t => t.mobile == mobile);
+        }
+
+        public async Task UpdateAsync(int id, Teachers teacher)
+        {
+            var existingTeacher = await _context.Teachers.FindAsync(id);
+
+            if (existingTeacher == null)
+                throw new Exception("Teacher not found");
+
+            _context.Teachers.Update(existingTeacher);
             await _context.SaveChangesAsync();
         }
+
     }
 }
+
+

@@ -105,6 +105,9 @@ namespace Data.Lawfullingo.Migrations
                     b.Property<DateTime>("end_date")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("flag")
+                        .HasColumnType("int");
+
                     b.Property<string>("language")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -121,9 +124,6 @@ namespace Data.Lawfullingo.Migrations
 
                     b.Property<bool>("status")
                         .HasColumnType("bit");
-
-                    b.Property<int>("teacher_id")
-                        .HasColumnType("int");
 
                     b.Property<int>("teachersid")
                         .HasColumnType("int");
@@ -200,6 +200,46 @@ namespace Data.Lawfullingo.Migrations
                     b.ToTable("Courses_Class");
                 });
 
+            modelBuilder.Entity("Entity.Lawfullingo.OTP", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpirationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ForOtp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsChecked")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("NewMobile")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Otp")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("OTPs");
+                });
+
             modelBuilder.Entity("Entity.Lawfullingo.Purchase", b =>
                 {
                     b.Property<int>("id")
@@ -241,6 +281,23 @@ namespace Data.Lawfullingo.Migrations
                     b.ToTable("Purchase");
                 });
 
+            modelBuilder.Entity("Entity.Lawfullingo.TeacherType", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<string>("name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("id");
+
+                    b.ToTable("TeacherTypes");
+                });
+
             modelBuilder.Entity("Entity.Lawfullingo.Teachers", b =>
                 {
                     b.Property<int>("id")
@@ -266,8 +323,8 @@ namespace Data.Lawfullingo.Migrations
                     b.Property<bool>("isVerified")
                         .HasColumnType("bit");
 
-                    b.Property<int>("mobile")
-                        .HasColumnType("int");
+                    b.Property<long?>("mobile")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("password")
                         .IsRequired()
@@ -280,15 +337,20 @@ namespace Data.Lawfullingo.Migrations
                     b.Property<bool>("status")
                         .HasColumnType("bit");
 
-                    b.Property<string>("user_email")
+                    b.Property<int>("teacherTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("teacher_email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("user_name")
+                    b.Property<string>("teacher_name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("id");
+
+                    b.HasIndex("teacherTypeId");
 
                     b.ToTable("Teachers");
                 });
@@ -304,11 +366,10 @@ namespace Data.Lawfullingo.Migrations
                     b.Property<DateTime>("created_at")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("deleted_at")
+                    b.Property<DateTime?>("deleted_at")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("education")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("gender")
@@ -318,15 +379,14 @@ namespace Data.Lawfullingo.Migrations
                     b.Property<bool>("isVerified")
                         .HasColumnType("bit");
 
-                    b.Property<int>("mobile")
-                        .HasColumnType("int");
+                    b.Property<long?>("mobile")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("profile_image")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("status")
@@ -398,6 +458,17 @@ namespace Data.Lawfullingo.Migrations
                     b.Navigation("course");
                 });
 
+            modelBuilder.Entity("Entity.Lawfullingo.OTP", b =>
+                {
+                    b.HasOne("Entity.Lawfullingo.Users", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Entity.Lawfullingo.Purchase", b =>
                 {
                     b.HasOne("Entity.Lawfullingo.Course", "course")
@@ -415,6 +486,17 @@ namespace Data.Lawfullingo.Migrations
                     b.Navigation("course");
 
                     b.Navigation("users");
+                });
+
+            modelBuilder.Entity("Entity.Lawfullingo.Teachers", b =>
+                {
+                    b.HasOne("Entity.Lawfullingo.TeacherType", "teacherType")
+                        .WithMany()
+                        .HasForeignKey("teacherTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("teacherType");
                 });
 
             modelBuilder.Entity("Entity.Lawfullingo.Category", b =>

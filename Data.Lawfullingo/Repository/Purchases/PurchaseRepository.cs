@@ -1,5 +1,6 @@
 ﻿using Entity.Lawfullingo;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Exchange.WebServices.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,13 @@ public class PurchaseRepository : IPurchaseRepository
     {
         _context = context;
     }
-
+    public async Task<List<Purchase>> GetCoursesByUserIdAsync(int userId)
+    {
+        return await _context.Purchase
+            .Include(p => p.course)
+            .Where(p => p.user_id == userId)
+            .ToListAsync();
+    }
     public async Task<IEnumerable<Purchase>> GetAllAsync()
     {
         return await _context.Purchase
@@ -33,31 +40,44 @@ public class PurchaseRepository : IPurchaseRepository
                        .FirstOrDefaultAsync(p => p.id == id);
     }
 
-    public async Task AddAsync(Purchase purchase)
+    public async Task<Purchase> AddAsync(Purchase purchase)
     {
        await _context.Purchase.AddAsync(purchase);
        await _context.SaveChangesAsync();
+        return purchase;
     }
 
-    public void UpdateAsync(Purchase purchase)
+    public async Task<string> UpdateAsync(Purchase purchase)
     {
         _context.Purchase.Update(purchase);
-        _context.SaveChangesAsync();
+      await  _context.SaveChangesAsync();
+        return "Purchase updated successfully";
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task<int> DeleteAsync(int id)
     {
         var purchase = await _context.Purchase.FindAsync(id);
         if (purchase != null)
         {
             _context.Purchase.Remove(purchase);
             await _context.SaveChangesAsync();
+            return id ;
         }
+        return 0;
     }
 
-    Task IPurchaseRepository.UpdateAsync(Purchase purchase)
+  
+
+    public async Task<List<Purchase>> GetCoursesByUserIdCourseIdAsync(int userId, int courseId)
     {
-        throw new NotImplementedException();
+        var purchases = await _context.Purchase
+                         .Where(p => p.user_id == userId && p.course_id == courseId)
+                         .Include(p => p.course)
+                         .ThenInclude(cv => cv.course_Classes)
+                         .ThenInclude(cc => cc.Class_Videos)
+                         .ToListAsync();
+
+        return purchases;
     }
 }
 

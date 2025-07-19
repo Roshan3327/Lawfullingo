@@ -12,7 +12,9 @@ namespace Data.Lawfullingo.Repository.Teacheres
         Task<IEnumerable<Teachers>> GetAllAsync();
         Task<Teachers> GetByIdAsync(int id);
         Task AddAsync(Teachers teacher);
-        Task UpdateAsync(Teachers teacher);
+        Task UpdateAsync(int id, Teachers teacher);
         Task DeleteAsync(int id);
+        Task<Teachers> GetTeacherByEmailAsync(string user_email);
+        Task<Teachers> GetTeacherByMobileAsync(long? mobile);
     }
 }
